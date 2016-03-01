@@ -145,7 +145,7 @@ public class Summarization {
 		}
 		else
 		{
-			float res=((2*(common_words/common_words_length))/(((queryList.size()/query_length)+(arrayList.size()/sentence_length))));
+			//float res=((2*(common_words/common_words_length))/(((queryList.size()/query_length)+(arrayList.size()/sentence_length))));
 			return common_words;
 		}
 	}
@@ -169,10 +169,10 @@ public class Summarization {
 				dummy2.add(s.substring(i, i+2).toLowerCase());
 			}
 		}
-		dummy2_length=dummy2.size()*2;
-		float size=dummy1.size();
+		//dummy2_length=dummy2.size()*2;
+		//float size=dummy1.size();
 		dummy1.retainAll(dummy2);
-		dummy_int_length=dummy1.size()*2;
+		//dummy_int_length=dummy1.size()*2;
 		/*if(dummy1.size()==0)
 			return 0;
 		else
@@ -202,20 +202,20 @@ public class Summarization {
 			}
 		}
 		dummy1.addAll(set);
-		for(String d : dummy1)
+		/*for(String d : dummy1)
 		{
 			dummy1_length+=d.length();
 		}
 		for(String a : arrayList)
 		{
 			arraylist_length+=a.length();
-		}
-		int size = dummy1.size();
+		}*/
+		//int size = dummy1.size();
 		dummy1.retainAll(arrayList);
-		for(String d :dummy1)
+		/*for(String d :dummy1)
 		{
 			dummy_int_length+=d.length();
-		}
+		}*/
 		/*if(dummy1.size()==0)
 			return 0;
 		else

@@ -48,10 +48,4 @@ public class NER
 	        }*/
 	        return null;
 	}
-	public static void main(String args[]) throws ClassCastException, ClassNotFoundException, IOException
-	{
-		IntPair p = ner("Tokyo is the bleakest place in the world.","Which");
-		System.out.println(p.get(0) + " " + p.get(1));
-		
-	}
 }

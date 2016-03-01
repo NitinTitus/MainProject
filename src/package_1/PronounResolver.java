@@ -52,10 +52,6 @@ public class PronounResolver {
 		}
 		return flag;
 	}
-	public static void find_pronoun(String sentence)
-	{
-		
-	}
 	public static void main(String[] args) 
 	{
 		int flag=pronoun("Barrack Obama is the president of America. He is a black guy. Nelson Mandela is from Africa. He is an amazing guy", 4, 1, "Nelson Mandela");
