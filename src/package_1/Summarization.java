@@ -9,8 +9,6 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.tartarus.snowball.ext.PorterStemmer;
-
 import edu.smu.tspell.wordnet.NounSynset;
 import edu.smu.tspell.wordnet.Synset;
 import edu.smu.tspell.wordnet.SynsetType;
@@ -104,7 +102,7 @@ public class Summarization {
 		}
 		return arrayList;
 	}
-	public static ArrayList<String> stemmer(ArrayList<String> arrayList)
+	/*public static ArrayList<String> stemmer(ArrayList<String> arrayList)
 	{
 		PorterStemmer porterStemmer = new PorterStemmer();
 		for(int i=0;i<arrayList.size();i++)
@@ -114,7 +112,7 @@ public class Summarization {
 			arrayList.set(i, porterStemmer.getCurrent());
 		}
 		return arrayList;
-	}
+	}*/
 	public static float word_count_similarity(ArrayList<String> queryList, ArrayList<String> arrayList)
 	{
 		float common_words=0;

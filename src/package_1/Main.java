@@ -22,8 +22,10 @@ public class Main {
 	static String pronoun_list[]={"I","you","she","he","it","we","they"};
 	public static void main(String[] args) throws ClassCastException, ClassNotFoundException, IOException 
 	{
-		String serializedClassifier = "G:/idm/stanford-ner-2014-06-16/classifiers/english.all.3class.distsim.crf.ser.gz";
-		AbstractSequenceClassifier<CoreLabel> classifier = CRFClassifier.getClassifier(serializedClassifier);
+		String serializedClassifier1 = "C:/Users/Nitin/Downloads/Compressed/stanford-ner-2014-06-16/stanford-ner-2014-06-16/classifiers/english.muc.7class.distsim.crf.ser.gz";
+		String serializedClassifier2 = "C:/Users/Nitin/Downloads/Compressed/stanford-ner-2014-06-16/stanford-ner-2014-06-16/classifiers/english.all.3class.distsim.crf.ser.gz";
+		AbstractSequenceClassifier<CoreLabel> classifier1 = CRFClassifier.getClassifier(serializedClassifier1),classifier;
+		AbstractSequenceClassifier<CoreLabel> classifier2 = CRFClassifier.getClassifier(serializedClassifier2);
 		BufferedReader bufferedReader = new BufferedReader(new FileReader("file.txt"));
 		query=bufferedReader.readLine();
 		passage=bufferedReader.readLine();
@@ -34,18 +36,9 @@ public class Main {
 		{
 			sentences[i]=sentences[i].replaceAll(",|;", "");
 		}
-		ArrayList<String> queryList = Summarization.stop_word_elimination(Summarization.tokenizer(query));
-		ArrayList<ArrayList<String>> arrayList = new ArrayList<ArrayList<String>>();
-		ArrayList<Float> score = new ArrayList<Float>();
-		float max_score,temp;
-		int index=0;
-		for(String s : sentences)
-		{
-			arrayList.add((Summarization.stop_word_elimination(Summarization.tokenizer(s))));
-		}
 		int sentence_no=Summarization.main(query, passage, sentences);
 		String answer=sentences[sentence_no];
-		String question_words[] = {"Who","Which","Where"},question_word = null;
+		String question_words[] = {"Who","Which","Where","How","When"},question_word = null;
 		String[] words = query.split("\\s+");
 		for(String word: words)
 		{
@@ -58,12 +51,22 @@ public class Main {
 				}
 			}
 		}
-		IntPair p = NER.ner(answer, question_word,classifier);
-		IntPair p1=NER.ner(user_answer, question_word,classifier);
+		List<IntPair> p;
+		if(question_word.equalsIgnoreCase("Who") || question_word.equalsIgnoreCase("Which") || question_word.equalsIgnoreCase("Where"))
+		{
+			p = NER.ner(answer, question_word,classifier2);
+			classifier=classifier2;
+		}
+		else
+		{
+			p = NER.ner(answer, question_word,classifier1);
+			classifier=classifier1;
+		}
+		//IntPair p1=NER.ner(user_answer, question_word,classifier);
 		String pronoun=null;
 		int count=0;
 		float similarity=0;
-		if(p==null)
+		if(p.size()==0)
 		{
 			words=answer.split("\\s+");
 			for(String word: words)
@@ -84,14 +87,32 @@ public class Main {
 			similarity=PronounResolver.pronoun(passage, sentence_no + 1, count - 1, user_answer);
 			if(similarity==-1 || similarity==0)
 			{
-				similarity=common_words(find_noun(sentences, sentence_no, count-1, classifier),user_answer);
+				similarity=common_words(find_noun(sentences, sentence_no, count-1, classifier2),user_answer);
 			}
-			
 		}
 		else
 		{
-			String answer_phrase = answer.substring(p.get(0), p.get(1));
-			/*String user_answer_phrase = user_answer.substring(p1.get(0), p1.get(1));*/
+			String candidate_answers[]=new String[p.size()],final_answer,answer_phrase;
+			if(candidate_answers.length==1)
+			{
+				answer_phrase=answer.substring(p.get(0).get(0), p.get(0).get(1));
+			}
+			else
+			{
+				for(int i=0;i<p.size();i++)
+				{
+					candidate_answers[i] = answer.substring(p.get(i).get(0), p.get(i).get(1));
+				}
+				String candidates[]=eliminate_candidates(query, candidate_answers, question_word, classifier);
+				if(candidates.length==1)
+				{
+					answer_phrase=candidates[0];
+				}
+				else
+				{
+					answer_phrase = Demo.init(answer, sentence_no, answer, candidates,query,passage);
+				}
+			}
 			similarity=common_words(answer_phrase, user_answer);
 		}
 		System.out.println(similarity);
@@ -177,5 +198,36 @@ public class Main {
 			return 1;
 		else
 			return 0;
+	}
+	public static String[] eliminate_candidates(String query, String candidate_answers[],String question_word, AbstractSequenceClassifier<CoreLabel> classifier) throws ClassCastException, ClassNotFoundException, IOException
+	{
+		List<IntPair> p;
+		int flag;
+		p=NER.ner(query, question_word, classifier);
+		String candidate_answer;
+		ArrayList<String> newlist = new ArrayList<String>();
+		for(int i=0;i<candidate_answers.length;i++)
+		{
+			flag=0;
+			for(int j=0;j<p.size();j++)
+			{
+				candidate_answer=query.substring(p.get(j).get(0),p.get(j).get(1));
+				if(candidate_answer.equalsIgnoreCase(candidate_answers[i]))
+				{
+					flag=1;
+					break;
+				}
+			}
+			if(flag==0)
+			{
+				newlist.add(candidate_answers[i]);
+			}
+		}
+		String new_candidate_list[]= new String[newlist.size()];
+		for(int i=0;i<newlist.size();i++)
+		{
+			new_candidate_list[i]=newlist.get(i);
+		}
+		return new_candidate_list;
 	}
 }
